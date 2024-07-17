@@ -1,0 +1,42 @@
+services:
+  # Laravel App
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
+    networks:
+      - f1-network
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=f1db
+      - DB_USERNAME=root
+      - DB_PASSWORD=Pass123wort
+
+  # MySQL Database
+  db:
+    image: mysql:5.7
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: Pass123wort
+      MYSQL_DATABASE: f1db
+    networks:
+      - f1-network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pPass123wort"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  f1-network:
+    driver: bridge
