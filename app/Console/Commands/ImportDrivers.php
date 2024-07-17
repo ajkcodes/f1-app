@@ -41,7 +41,12 @@ class ImportDrivers extends Command
     {
         $limit = 30;
         $offset = 0;
-        $total = 1;
+
+        $initResponse = Http::get('https://ergast.com/api/f1/drivers.json');
+
+        $total = $initResponse->json()['MRData']['total'];
+
+        $this->output->progressStart($total);
 
         while ($offset < $total) {
             $response = Http::get('https://ergast.com/api/f1/drivers.json', [
@@ -66,11 +71,14 @@ class ImportDrivers extends Command
                         'permanentNumber' => $driver['permanentNumber'] ?? null,
                     ]
                 );
+
+                $this->output->progressAdvance();
             }
 
             $offset += $limit;
         }
 
+        $this->output->progressFinish();
         $this->info('Drivers imported successfully!');
         return 0;
     }
