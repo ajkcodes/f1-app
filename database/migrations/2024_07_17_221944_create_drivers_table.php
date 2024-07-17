@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('drivers', function (Blueprint $table) {
-            $table->string('driverId')->unique();
+            $table->string('driverId')->primary()->unique();
             $table->string('code')->nullable();
             $table->string('url');
             $table->string('givenName');
