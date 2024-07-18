@@ -32,4 +32,9 @@ class Driver extends Model
     protected $casts = [
         'dateOfBirth' => 'date',
     ];
+
+    public function results()
+    {
+        return $this->hasMany(Result::class);
+    }
 }

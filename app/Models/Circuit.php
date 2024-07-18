@@ -30,4 +30,9 @@ class Circuit extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    public function races()
+    {
+        return $this->hasMany(Race::class, 'circuitId', 'circuitId');
+    }
 }

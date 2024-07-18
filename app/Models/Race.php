@@ -5,26 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Constructor extends Model
+class Race extends Model
 {
     use HasFactory;
 
-    protected $table = 'constructors';
+    protected $table = 'races';
 
     protected $fillable = [
-        'constructorId',
+        'season',
+        'round',
         'url',
-        'name',
-        'nationality'
+        'raceName',
+        'date',
+        'circuitId'
     ];
 
-    protected $primaryKey = 'constructorId';
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
-
-    public $timestamps = true;
+    public function circuit()
+    {
+        return $this->belongsTo(Circuit::class, 'circuitId', 'circuitId');
+    }
 
     public function results()
     {
