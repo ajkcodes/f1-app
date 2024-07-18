@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container mt-5">
-        <h1>Races</h1>
+        <h1>Rennen</h1>
         <form action="{{ route('races.index') }}" method="GET">
             <div class="form-group">
                 <label for="circuitName">Rennstrecke</label>
@@ -28,11 +28,11 @@
                     @endforeach
                 </select>
             </div>
-            <button type="submit">Filtern</button>
+            <button type="submit" class="btn btn-primary">Filtern</button>
         </form>
 
         @if($races->count())
-            <table class="table table-bordered">
+            <table class="table table-bordered mt-3">
                 <thead>
                     <tr>
                         <th>Saison</th>
@@ -60,7 +60,7 @@
             </table>
 
             <div class="d-flex justify-content-center pagination">
-                {{ $races->links() }}
+                {{ $races->appends(request()->query())->links() }}
             </div>
         @else
             <p>Keine Rennen gefunden.</p>

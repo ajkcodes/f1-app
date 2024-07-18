@@ -24,10 +24,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('races.index') }}">Races</a>
                     </li>
-                    {{-- <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('drivers.index') }}">Drivers</a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link" href="{{ route('constructors.index') }}">Constructors</a>
                     </li>
                     <li class="nav-item">
