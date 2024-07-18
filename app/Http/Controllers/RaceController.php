@@ -30,6 +30,6 @@ class RaceController extends Controller
 
         $races = $query->paginate(10);
 
-        return view('races', compact('races', 'seasons', 'circuits'));
+        return view('races.index', compact('races', 'seasons', 'circuits'));
     }
 }
