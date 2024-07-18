@@ -7,4 +7,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('races', [RaceController::class, 'index']);
+Route::get('races', [RaceController::class, 'index'])->name('races');

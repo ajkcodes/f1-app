@@ -12,19 +12,29 @@
         <div class="header">
             Liste der Rennen
         </div>
-        <form action="" method="GET">
-            <input type="text" name="circuitName" placeholder="Filter nach Rennstrecke">
-            <button type="submit">Filtern</button>
-        </form>
-        <form action="" method="GET">
-            <select name="season">
-                <option value="">Alle Jahre</option>
-                @foreach ($seasons as $season)
-                    <option value="{{ $season }}" {{ request('season') == $season ? 'selected' : '' }}>
-                        {{ $season }}
-                    </option>
-                @endforeach
-            </select>
+        <form action="{{ route('races') }}" method="GET">
+            <div class="form-group">
+                <label for="circuitName">Rennstrecke</label>
+                <select name="circuitName" id="circuitName" class="form-control">
+                    <option value="">Rennstrecke</option>
+                    @foreach($circuits as $circuit)
+                        <option value="{{ $circuit }}" {{ request('circuitName') == $circuit ? 'selected' : '' }}>
+                            {{ $circuit }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="season">Jahr</label>
+                <select name="season">
+                    <option value="">Alle Jahre</option>
+                    @foreach ($seasons as $season)
+                        <option value="{{ $season }}" {{ request('season') == $season ? 'selected' : '' }}>
+                            {{ $season }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             <button type="submit">Filtern</button>
         </form>
         <div class="race-list">
