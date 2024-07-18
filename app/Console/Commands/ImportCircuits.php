@@ -28,11 +28,15 @@ class ImportCircuits extends Command
      */
     public function handle()
     {
+        $this->info('Starting Import Circuits.');
+
+        // Starttime of import
+        $startTime = microtime(true);
+
         $limit = 30;
         $offset = 0;
 
         $initResponse = Http::get('http://ergast.com/api/f1/circuits.json');
-
         $total = $initResponse->json()['MRData']['total'];
 
         $this->output->progressStart($total);
@@ -48,7 +52,7 @@ class ImportCircuits extends Command
 
             foreach ($circuits as $circuit) {
                 $locationData = $circuit['Location'];
-                $location = Location::updateOrCreate(
+                $location = Location::firstOrCreate(
                     ['lat' => $locationData['lat'], 'long' => $locationData['long']],
                     [
                         'locality' => $locationData['locality'],
@@ -56,7 +60,7 @@ class ImportCircuits extends Command
                     ]
                 );
 
-                Circuit::updateOrCreate(
+                Circuit::firstOrCreate(
                     ['circuitId' => $circuit['circuitId']],
                     [
                         'url' => $circuit['url'],
@@ -71,8 +75,14 @@ class ImportCircuits extends Command
             $offset += $limit;
         }
 
+        // Endtime of import
+        $endTime = microtime(true);
+
+        // Calculate the total duration of the import in seconds
+        $duration = round($endTime - $startTime, 2);
+
         $this->output->progressFinish();
-        $this->info('Circuits imported successfully!');
+        $this->info("Circuits imported successfully in {$duration} seconds!");
         return 0;
     }
 }

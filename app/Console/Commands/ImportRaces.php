@@ -29,11 +29,16 @@ class ImportRaces extends Command
      */
     public function handle()
     {
+        $this->info('Starting Import Races.');
+
+        // Starttime of import
+        $startTime = microtime(true);
+
         $limit = 30;
         $offset = 0;
 
+        // Initial request to get the total number of results
         $initResponse = Http::get('https://ergast.com/api/f1/races.json');
-
         $total = $initResponse->json()['MRData']['total'];
 
         $this->output->progressStart($total);
@@ -51,7 +56,7 @@ class ImportRaces extends Command
             foreach($races as $race) {
                 // First Location Data
                 $locationData = $race['Circuit']['Location'];
-                $location = Location::updateOrCreate(
+                $location = Location::firstOrCreate(
                     ['lat' => $locationData['lat'], 'long' => $locationData['long']],
                     [
                         'locality' => $locationData['locality'],
@@ -61,7 +66,7 @@ class ImportRaces extends Command
 
                 // Second Circuit Data
                 $circuitData = $race['Circuit'];
-                $circuit = Circuit::updateOrCreate(
+                $circuit = Circuit::firstOrCreate(
                     ['circuitId' => $circuitData['circuitId']],
                     [
                         'url' => $circuitData['url'],
@@ -71,7 +76,7 @@ class ImportRaces extends Command
                 );
 
                 // Last Race Data
-                Race::updateOrCreate(
+                Race::firstOrCreate(
                     [
                         'season' => $race['season'],
                         'round' => $race['round']
@@ -90,8 +95,14 @@ class ImportRaces extends Command
             $offset += $limit;
         }
 
+        // Endtime of import
+        $endTime = microtime(true);
+
+        // Calculate the total duration of the import in seconds
+        $duration = round($endTime - $startTime, 2);
+
         $this->output->progressFinish();
-        $this->info('Races imported successfully!');
+        $this->info("Races imported successfully in {$duration} seconds!");
         return 0;
     }
 }

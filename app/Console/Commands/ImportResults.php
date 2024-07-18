@@ -32,6 +32,11 @@ class ImportResults extends Command
      */
     public function handle()
     {
+        $this->info('Starting Import Results.');
+
+        // Starttime of import
+        $startTime = microtime(true);
+
         $limit = 30;
         $offset = 0;
 
@@ -53,7 +58,7 @@ class ImportResults extends Command
             foreach ($results as $raceData) {
                 // Location Data
                 $locationData = $raceData['Circuit']['Location'];
-                $location = Location::updateOrCreate(
+                $location = Location::firstOrCreate(
                     [
                         'lat' => $locationData['lat'],
                         'long' => $locationData['long']
@@ -66,7 +71,7 @@ class ImportResults extends Command
 
                 // Circuit Data
                 $circuitData = $raceData['Circuit'];
-                $circuit = Circuit::updateOrCreate(
+                $circuit = Circuit::firstOrCreate(
                     [
                         'circuitId' => $circuitData['circuitId']
                     ],
@@ -78,7 +83,7 @@ class ImportResults extends Command
                 );
 
                 // Race Data
-                $race = Race::updateOrCreate(
+                $race = Race::firstOrCreate(
                     [
                         'season' => $raceData['season'],
                         'round' => $raceData['round']
@@ -95,7 +100,7 @@ class ImportResults extends Command
                 foreach ($raceData['Results'] as $resultData) {
                     // Driver Data
                     $driverData = $resultData['Driver'];
-                    $driver = Driver::updateOrCreate(
+                    $driver = Driver::firstOrCreate(
                         [
                             'driverId' => $driverData['driverId']
                         ],
@@ -110,7 +115,7 @@ class ImportResults extends Command
 
                     // Constructor Data
                     $constructorData = $resultData['Constructor'];
-                    $constructor = Constructor::updateOrCreate(
+                    $constructor = Constructor::firstOrCreate(
                         [
                             'constructorId' => $constructorData['constructorId']
                         ],
@@ -122,7 +127,7 @@ class ImportResults extends Command
                     );
 
                     // Result Data
-                    Result::updateOrCreate(
+                    Result::firstOrCreate(
                         [
                             'race_id' => $race->id,
                             'driverId' => $driver['driverId'],
@@ -148,8 +153,14 @@ class ImportResults extends Command
             $offset += $limit;
         }
 
+        // Endtime of import
+        $endTime = microtime(true);
+
+        // Calculate the total duration of the import in seconds
+        $duration = round($endTime - $startTime, 2);
+
         $this->output->progressFinish();
-        $this->info('Results imported successfully.');
+        $this->info("Results imported successfully in {$duration} seconds.");
         return 0;
     }
 }

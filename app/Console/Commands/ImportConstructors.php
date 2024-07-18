@@ -39,11 +39,15 @@ class ImportConstructors extends Command
      */
     public function handle()
     {
+        $this->info('Starting Import Constructors.');
+
+        // Starttime of import
+        $startTime = microtime(true);
+
         $limit = 30;
         $offset = 0;
 
         $initResponse = Http::get('https://ergast.com/api/f1/constructors.json');
-
         $total = $initResponse->json()['MRData']['total'];
 
         $this->output->progressStart($total);
@@ -59,7 +63,7 @@ class ImportConstructors extends Command
             $constructors = $data['MRData']['ConstructorTable']['Constructors'];
 
             foreach($constructors as $constructor) {
-                Constructor::updateOrCreate(
+                Constructor::firstOrCreate(
                     ['constructorId' => $constructor['constructorId']],
                     [
                         'url' => $constructor['url'],
@@ -74,8 +78,14 @@ class ImportConstructors extends Command
             $offset += $limit;
         }
 
+        // Endtime of import
+        $endTime = microtime(true);
+
+        // Calculate the total duration of the import in seconds
+        $duration = round($endTime - $startTime, 2);
+
         $this->output->progressFinish();
-        $this->info('Constructors imported successfully!');
+        $this->info("Constructors imported successfully in {$duration} seconds!");
         return 0;
     }
 }

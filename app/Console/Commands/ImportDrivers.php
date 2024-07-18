@@ -39,11 +39,16 @@ class ImportDrivers extends Command
      */
     public function handle()
     {
+        $this->info('Starting Import Drivers.');
+
+        // Starttime of import
+        $startTime = microtime(true);
+
         $limit = 30;
         $offset = 0;
 
+        // Initial request to get the total number of results
         $initResponse = Http::get('https://ergast.com/api/f1/drivers.json');
-
         $total = $initResponse->json()['MRData']['total'];
 
         $this->output->progressStart($total);
@@ -59,7 +64,7 @@ class ImportDrivers extends Command
             $drivers = $data['MRData']['DriverTable']['Drivers'];
 
             foreach($drivers as $driver) {
-                Driver::updateOrCreate(
+                Driver::firstOrCreate(
                     ['driverId' => $driver['driverId']],
                     [
                         'code' => $driver['code'] ?? null,
@@ -78,8 +83,14 @@ class ImportDrivers extends Command
             $offset += $limit;
         }
 
+        // Endtime of import
+        $endTime = microtime(true);
+
+        // Calculate the total duration of the import in seconds
+        $duration = round($endTime - $startTime, 2);
+
         $this->output->progressFinish();
-        $this->info('Drivers imported successfully!');
+        $this->info("Drivers imported successfully in {$duration} seconds!");
         return 0;
     }
 }

@@ -27,11 +27,16 @@ class ImportSeasons extends Command
      */
     public function handle()
     {
+        $this->info('Starting Import Seasons.');
+
+        // Starttime of import
+        $startTime = microtime(true);
+
         $limit = 30;
         $offset = 0;
 
+        // Initial request to get the total number of results
         $initResponse = Http::get('https://ergast.com/api/f1/seasons.json');
-
         $total = $initResponse->json()['MRData']['total'];
 
         $this->output->progressStart($total);
@@ -47,7 +52,7 @@ class ImportSeasons extends Command
             $seasons = $data['MRData']['SeasonTable']['Seasons'];
 
             foreach($seasons as $season) {
-                Season::updateOrCreate(
+                Season::firstOrCreate(
                     ['season' => $season['season']],
                     ['url' => $season['url']]
                 );
@@ -58,8 +63,14 @@ class ImportSeasons extends Command
             $offset += $limit;
         }
 
+        // Endtime of import
+        $endTime = microtime(true);
+
+        // Calculate the total duration of the import in seconds
+        $duration = round($endTime - $startTime, 2);
+
         $this->output->progressFinish();
-        $this->info('Seasons imported successfully!');
+        $this->info("Seasons imported successfully in {$duration} seconds!");
         return 0;
     }
 }
