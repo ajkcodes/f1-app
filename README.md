@@ -1,4 +1,4 @@
-# Formula 1 Verwaltungsanwendung
+# Formel 1 Verwaltungsanwendung
 
 Diese Anwendung verwaltet Daten der Formel 1, aktuell nur die Fahrer und Rennen.
 
