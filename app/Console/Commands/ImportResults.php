@@ -63,23 +63,25 @@ class ImportResults extends Command
 
                 // Results Data
                 foreach ($raceData['Results'] as $resultData) {
-                    $resultsToInsert[] = [
-                        'race_id' => $race->id,
-                        'driverId' => $resultData['Driver']['driverId'],
-                        'constructorId' => $resultData['Constructor']['constructorId'],
-                        'position' => $resultData['position'],
-                        'number' => $resultData['number'],
-                        'positionText' => $resultData['positionText'],
-                        'points' => $resultData['points'],
-                        'grid' => $resultData['grid'],
-                        'laps' => $resultData['laps'],
-                        'status' => $resultData['status'],
-                        'time' => $resultData['Time']['time'] ?? null,
-                        'time_millis' => $resultData['Time']['millis'] ?? null
-                    ];
+                    Result::firstOrCreate(
+                        [
+                            'race_id' => $race->id,
+                            'driverId' => $resultData['Driver']['driverId'],
+                            'constructorId' => $resultData['Constructor']['constructorId'],
+                            'position' => $resultData['position']
+                        ],
+                        [
+                            'number' => $resultData['number'],
+                            'positionText' => $resultData['positionText'],
+                            'points' => $resultData['points'],
+                            'grid' => $resultData['grid'],
+                            'laps' => $resultData['laps'],
+                            'status' => $resultData['status'],
+                            'time' => $resultData['Time']['time'] ?? null,
+                            'time_millis' => $resultData['Time']['millis'] ?? null
+                        ]
+                    );
                 }
-
-                Result::insert($resultsToInsert);
 
                 $this->output->progressAdvance();
             }
