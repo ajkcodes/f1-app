@@ -56,96 +56,30 @@ class ImportResults extends Command
             $results = $data['MRData']['RaceTable']['Races'];
 
             foreach ($results as $raceData) {
-                // Location Data
-                $locationData = $raceData['Circuit']['Location'];
-                $location = Location::firstOrCreate(
-                    [
-                        'lat' => $locationData['lat'],
-                        'long' => $locationData['long']
-                    ],
-                    [
-                        'locality' => $locationData['locality'],
-                        'country' => $locationData['country']
-                    ]
-                );
-
-                // Circuit Data
-                $circuitData = $raceData['Circuit'];
-                $circuit = Circuit::firstOrCreate(
-                    [
-                        'circuitId' => $circuitData['circuitId']
-                    ],
-                    [
-                        'url' => $circuitData['url'],
-                        'circuitName' => $circuitData['circuitName'],
-                        'location_id' => $location->id
-                    ]
-                );
-
                 // Race Data
-                $race = Race::firstOrCreate(
-                    [
-                        'season' => $raceData['season'],
-                        'round' => $raceData['round']
-                    ],
-                    [
-                        'url' => $raceData['url'],
-                        'raceName' => $raceData['raceName'],
-                        'date' => $raceData['date'],
-                        'circuitId' => $circuit['circuitId']
-                    ]
-                );
+                $race = Race::where('season', $raceData['season'])
+                            ->where('round', $raceData['round'])
+                            ->first();
 
                 // Results Data
                 foreach ($raceData['Results'] as $resultData) {
-                    // Driver Data
-                    $driverData = $resultData['Driver'];
-                    $driver = Driver::firstOrCreate(
-                        [
-                            'driverId' => $driverData['driverId']
-                        ],
-                        [
-                            'url' => $driverData['url'],
-                            'givenName' => $driverData['givenName'],
-                            'familyName' => $driverData['familyName'],
-                            'dateOfBirth' => $driverData['dateOfBirth'],
-                            'nationality' => $driverData['nationality']
-                        ]
-                    );
-
-                    // Constructor Data
-                    $constructorData = $resultData['Constructor'];
-                    $constructor = Constructor::firstOrCreate(
-                        [
-                            'constructorId' => $constructorData['constructorId']
-                        ],
-                        [
-                            'url' => $constructorData['url'],
-                            'name' => $constructorData['name'],
-                            'nationality' => $constructorData['nationality']
-                        ]
-                    );
-
-                    // Result Data
-                    Result::firstOrCreate(
-                        [
-                            'race_id' => $race->id,
-                            'driverId' => $driver['driverId'],
-                            'constructorId' => $constructor['constructorId'],
-                            'position' => $resultData['position']
-                        ],
-                        [
-                            'number' => $resultData['number'],
-                            'positionText' => $resultData['positionText'],
-                            'points' => $resultData['points'],
-                            'grid' => $resultData['grid'],
-                            'laps' => $resultData['laps'],
-                            'status' => $resultData['status'],
-                            'time' => $resultData['Time']['time'] ?? null,
-                            'milliseconds' => $resultData['Time']['millis'] ?? null
-                        ]
-                    );
+                    $resultsToInsert[] = [
+                        'race_id' => $race->id,
+                        'driverId' => $resultData['Driver']['driverId'],
+                        'constructorId' => $resultData['Constructor']['constructorId'],
+                        'position' => $resultData['position'],
+                        'number' => $resultData['number'],
+                        'positionText' => $resultData['positionText'],
+                        'points' => $resultData['points'],
+                        'grid' => $resultData['grid'],
+                        'laps' => $resultData['laps'],
+                        'status' => $resultData['status'],
+                        'time' => $resultData['Time']['time'] ?? null,
+                        'time_millis' => $resultData['Time']['millis'] ?? null
+                    ];
                 }
+
+                Result::insert($resultsToInsert);
 
                 $this->output->progressAdvance();
             }
