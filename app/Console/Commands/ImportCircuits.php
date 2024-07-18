@@ -46,8 +46,8 @@ class ImportCircuits extends Command
             $data = $response->json();
             $circuits = $data['MRData']['CircuitTable']['Circuits'];
 
-            foreach ($circuits as $circuitData) {
-                $locationData = $circuitData['Location'];
+            foreach ($circuits as $circuit) {
+                $locationData = $circuit['Location'];
                 $location = Location::updateOrCreate(
                     ['lat' => $locationData['lat'], 'long' => $locationData['long']],
                     [
@@ -57,10 +57,10 @@ class ImportCircuits extends Command
                 );
 
                 Circuit::updateOrCreate(
-                    ['circuitId' => $circuitData['circuitId']],
+                    ['circuitId' => $circuit['circuitId']],
                     [
-                        'url' => $circuitData['url'],
-                        'circuitName' => $circuitData['circuitName'],
+                        'url' => $circuit['url'],
+                        'circuitName' => $circuit['circuitName'],
                         'location_id' => $location->id,
                     ]
                 );
